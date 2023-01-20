@@ -1,0 +1,131 @@
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128 
+#define SCREEN_HEIGHT 64
+
+#define encoder_p1 2
+#define encoder_p2 3
+
+#define encoder_i1 18
+#define encoder_i2 19
+
+
+float set_p=0.000;
+float set_i=0.000;
+float set_d=0.000;
+int p_conve=0;
+
+//int set_p=0;
+//int set_i=0;
+//int set_d=0;
+
+Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+void setup() {
+  
+
+  setups();
+  
+  Serial.begin(9600);
+  oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  oled.display();
+  delay(2000);         // wait for initializing
+  oled.clearDisplay(); // clear display
+
+           
+}
+
+void loop() {
+  
+  oled.clearDisplay();
+  line_text();
+  
+  
+  oled.setTextSize(2);          
+  oled.setTextColor(WHITE);     
+  oled.setCursor(55, 0);        
+  oled.println(set_p);
+  Serial.print(F("P :"));
+  Serial.println(set_p);
+  p_conve=(set_p*100);
+  Serial.write(p_conve);
+  Serial.print(F("P_send: :"));
+  Serial.println(p_conve);
+  Serial.print("\n");
+ 
+
+  oled.setTextSize(2);          
+  oled.setTextColor(WHITE); 
+  oled.setCursor(55, 24);        
+  oled.println(set_i);
+//  Serial.println(set_i);
+//  Serial.write();
+  
+  
+  oled.setTextSize(2);          
+  oled.setTextColor(WHITE); 
+  oled.setCursor(55, 46);        
+  oled.println("0.000");
+  oled.display();  
+
+
+
+  
+}
+
+
+void setups(){// -------------------------set pinout and init
+  
+  pinMode(encoder_p1, INPUT_PULLUP); //encoder 1 for p statment
+  pinMode(encoder_p2, INPUT_PULLUP); 
+  attachInterrupt(digitalPinToInterrupt(encoder_p1), encoder_p, RISING);
+
+  //encoder_i
+  pinMode (encoder_i1, INPUT_PULLUP);
+  pinMode (encoder_i2, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(encoder_i1), encoder_i, RISING);
+
+}
+
+
+void encoder_p() { //-----------------------Encoder Count
+  if (digitalRead(encoder_p2) == HIGH) 
+    set_p=set_p + 0.01; 
+  else 
+    set_p=set_p - 0.01; 
+
+//   if (digitalRead(encoder_p2) == HIGH) 
+//    set_p++; 
+//  else 
+//    set_p--;
+}
+
+void line_text(){
+    
+//  oled.drawLine(10, 20, 108, 20, WHITE);
+  oled.drawLine(10, 20, 118, 20, WHITE);
+//  oled.drawLine(10, 0, 118, 0, WHITE);
+  oled.drawLine(10, 41, 118, 41, WHITE);
+
+
+  
+  oled.setTextSize(2);          
+  oled.setTextColor(WHITE);     
+  oled.setCursor(15, 0);        
+  oled.println("P");
+  oled.setCursor(15, 24);        
+  oled.println("I");
+  oled.setCursor(15, 46);        
+  oled.println("D");
+}
+
+
+void encoder_i(){
+    if (digitalRead(encoder_i2) == HIGH) 
+    set_i=set_i + 0.0025; 
+  else 
+    set_i=set_i - 0.0025; 
+}
+
